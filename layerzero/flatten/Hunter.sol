@@ -819,27 +819,27 @@ contract Hunter is ERC20, Ownable, ReentrancyGuard, ILayerZeroReceiver {
     address public DstAddress = 0x6aB5Ae6822647046626e83ee6dB8187151E1d5ab; // ploygon zkevm testnet user application
 
     constructor() ERC20("Hunter", "HTR") Ownable() ReentrancyGuard() {
-        ERC20._mint(address(this), Supply);
+        _mint(address(this), Supply);
     }
 
     function bridgeMessage() external payable nonReentrant {
-        bytes memory remoteAndLocalAddresses = abi.encodePacked(DstAddress, msg.sender);
+        bytes memory remoteAndLocalAddresses = abi.encodePacked(DstAddress, address(this));
         ILayerZeroEndpoint(SrcEndpoint).send{value : msg.value}(
             DstChainID, 
             remoteAndLocalAddresses, 
-            bytes("good mornning"), 
+            abi.encodePacked(msg.sender), 
             payable(this), 
             address(0x0), 
             bytes("")
         );
-        this.transferFrom(address(this), msg.sender, 100000000000000000000);
+        _transfer(address(this), msg.sender, 100000000000000000000);
     }
 
     function estimateFees() external view returns (uint nativeFee, uint zroFee) {
         return ILayerZeroEndpoint(SrcEndpoint).estimateFees(
             DstChainID, 
             DstAddress, 
-            bytes("good mornning"), 
+            abi.encodePacked(msg.sender), 
             false, 
             bytes("")
         );
@@ -850,13 +850,13 @@ contract Hunter is ERC20, Ownable, ReentrancyGuard, ILayerZeroReceiver {
         payable(Ownable.owner()).transfer(address(this).balance);
     }
 
-    function lzReceive(uint16, bytes memory _srcAddress, uint64, bytes memory) external nonReentrant {
+    function lzReceive(uint16, bytes memory, uint64, bytes memory _data) external nonReentrant {
         require(msg.sender == address(SrcEndpoint));
         address fromAddress;
         assembly {
-            fromAddress := mload(add(_srcAddress, 20))
+            fromAddress := mload(add(_data, 20))
         }
-        this.transferFrom(address(this), fromAddress, 100000000000000000000);
+        _transfer(address(this), fromAddress, 100000000000000000000);
     }
 
     function updateDstAddress(address _dstAddress) external onlyOwner nonReentrant {
@@ -869,6 +869,3 @@ contract Hunter is ERC20, Ownable, ReentrancyGuard, ILayerZeroReceiver {
     receive() external payable {
     }
 }
-
-
-// File contracts/flatten/Hunter.sol
