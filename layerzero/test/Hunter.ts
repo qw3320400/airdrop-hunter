@@ -12,7 +12,7 @@ describe("Hunter", function () {
 
         it("deploy Hunter", async function () {
             const Hunter = await ethers.getContractFactory("Hunter");
-            const hunter = await Hunter.deploy();
+            const hunter = await Hunter.deploy("0x0000000000000000000000000000000000000000");
             await hunter.deployed();
             hunterAddress = hunter.address;
             expect(await hunter.name()).equal("Hunter");
@@ -55,6 +55,19 @@ describe("Hunter", function () {
             var balance0 = await ethers.provider.getBalance(accounts[0].address);
             var balance1 = await ethers.provider.getBalance(accounts[1].address);
             expect(balance0.sub(balance1)).greaterThan(BigNumber.from("3900000000000000000"));
+        });
+
+    });
+
+    describe("Config", function () {
+
+        it("update and check config", async function () {
+            const Hunter = await ethers.getContractFactory("Hunter");
+            const hunter = await Hunter.attach(hunterAddress.toString());
+            await hunter.updateSrcEndpoint(hunterAddress);
+            expect((await hunter.getSrcEndpoint()).toString()).equal(hunterAddress.toString());
+            await hunter.updateChainConfig(100, hunterAddress);
+            expect((await hunter.getChainConfig(100)).toString()).equal(hunterAddress.toString());
         });
 
     });

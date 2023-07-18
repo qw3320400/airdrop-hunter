@@ -5,7 +5,7 @@ async function main() {
     const unlockTime = currentTimestampInSeconds + 60;
 
     const Hunter = await ethers.getContractFactory("Hunter");
-    const hunter = await Hunter.deploy();
+    const hunter = await Hunter.deploy("0x0000000000000000000000000000000000000000");
 
     await hunter.deployed();
 
