@@ -1,0 +1,43 @@
+pragma solidity ^0.8.0;
+
+/**
+interface IterableMapping {
+
+    // add/modify key-value
+    function set(address key, uint value) external;
+
+    // iterate all values
+    function iterateValue() external view returns (uint[] memory);
+
+    // add some getters if necessary
+
+}
+ */
+
+abstract contract IterableMapping {
+
+    mapping (address => uint) public data;
+
+    address [] public list;
+
+    constructor() { 
+    }
+
+    function set(address key, uint value) external {
+        // TODO if (data[key] )
+        data[key] = value;
+        list.push(key);
+    }
+
+    function iterateValue() external view returns (uint[] memory) {
+        uint[] memory ret = new uint[] (list.length);
+        for (uint i = 0; i < list.length; i++) {
+            ret[i] = data[list[i]];
+        }
+        return ret;
+    }
+
+    function getLength() view external returns (uint) {
+        return list.length;
+    }
+}

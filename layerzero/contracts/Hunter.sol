@@ -41,7 +41,7 @@ contract Hunter is ERC20, Ownable, ReentrancyGuard, ILayerZeroReceiver, ChainsCo
             false, 
             bytes("")
         );
-        nativeFee = nativeFee / 100 * 150;
+        // nativeFee = nativeFee / 100 * 150;
         return nativeFee;
     }
 
